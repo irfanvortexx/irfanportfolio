@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Happy Birthday Shahana 💖</title>
+    <style>
+         :root {
+            --bg1: #000;
+            --bg2: #050010;
+            --text: #ffdce8;
+            --accent: #ff7ab5;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            background: radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 100%);
+            font-family: Georgia, "Segoe UI", serif;
+            color: var(--text);
+            overflow: hidden;
+        }
+        
+        .wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            background: transparent;
+        }
+        
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        
+        h2 {
+            font-family: "Segoe Script", "Brush Script MT", cursive;
+            font-size: 44px;
+            margin: 0;
+            text-align: center;
+            text-shadow: 0 0 20px #ff85c2, 0 0 40px #ff3ea6;
+        }
+        
+        .note {
+            width: 76%;
+            max-width: 760px;
+            margin-top: 16px;
+            text-align: center;
+            line-height: 1.45;
+            font-size: 18px;
+            color: var(--text);
+            text-shadow: 0 0 10px #ff8aca;
+        }
+        
+        .typing {
+            white-space: pre-wrap;
+            min-height: 180px
+        }
+        
+        .bear-stage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto
+        }
+        
+        .bear-stage img {
+            max-width: 420px;
+            width: 50vmin;
+            max-height: 420px;
+            filter: drop-shadow(0 0 25px #ff7bd4);
+        }
+        
+        .bear-stage h2 {
+            font-family: "Segoe Script", cursive;
+            font-size: 28px;
+            margin: 0;
+            color: var(--text);
+            text-shadow: 0 0 20px #ff78d1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <canvas id="c"></canvas>
+        <div class="overlay">
+            <h2 id="title">Happy Birthday Shahana 💖</h2>
+            <div class="note typing" id="note"></div>
+            <div id="bearStage" class="bear-stage">
+                <img id="bearImg" src="" alt="bear frame" />
+                <h3>Happy Birthday Shahana 💖</h3>
+            </div>
+        </div>
+    </div>
+    <script>
+        /* Setup */
+        const CANVAS = document.getElementById('c');
+        const ctx = CANVAS.getContext('2d', {
+            alpha: true
+        });
+        let W = CANVAS.width = window.innerWidth;
+        let H = CANVAS.height = window.innerHeight;
+        const PARTICLES = 1500;
+        const MAIN_TEXT = "";
+        const NOTE = [
+            "In every line of code I've written for this little program,",
+            "I've poured in my love and gratitude for you.",
+            "You've been my inspiration, my light, and my everything.",
+            "Thank you for being the amazing person you are—",
+            "kind, beautiful, and endlessly supportive.",
+            "This is my way of saying how much I appreciate you",
+            "and all the joy you bring into my life."
+        ];
+
+        function heartPoint(t, s) {
+            const x = s * 16 * Math.pow(Math.sin(t), 3);
+            const y = -s * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            return [x, y];
+        }
+
+        function generateHeartPositions(n, scale, ox, oy) {
+            const pts = [];
+            for (let i = 0; i < n; i++) {
+                const t = Math.random() * Math.PI * 2;
+                const r = 0.7 + Math.random() * 0.3;
+                const [x, y] = heartPoint(t, scale * r);
+                pts.push([ox + x, oy + y]);
+            }
+            return pts;
+        }
+        class Particle {
+            constructor(target) {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.tx = target[0];
+                this.ty = target[1];
+                this.speed = 0.02 + Math.random() * 0.04;
+                this.size = 1 + Math.floor(Math.random() * 4);
+                const base = [255, 110, 175];
+                const v = i => Math.max(0, Math.min(255, base[i] + (Math.random() * 50 - 25)));
+                this.color = `rgba(${v(0)},${v(1)},${v(2)},`;
+            }
+            update(p) {
+                const cx = W / 2,
+                    cy = H / 2;
+                const dx = this.tx - cx,
+                    dy = this.ty - cy;
+                const txp = cx + dx * p,
+                    typ = cy + dy * p;
+                this.x += (txp - this.x) * this.speed;
+                this.y += (typ - this.y) * this.speed;
+            }
+            draw(a) {
+                const alpha = a / 255;
+                ctx.beginPath();
+                ctx.fillStyle = this.color + (alpha * 0.4) + ')';
+                ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.fillStyle = this.color + alpha + ')';
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        let heartPos = [],
+            particles = [];
+
+        function initParticles() {
+            heartPos = generateHeartPositions(PARTICLES, Math.min(W, H) / 45, W / 2, H / 2);
+            particles = heartPos.map(p => new Particle(p));
+        }
+        initParticles();
+
+        /* Background floating glow balls */
+        const balls = Array.from({
+            length: 50
+        }, () => ({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 3 + 2,
+            dx: (Math.random() - 0.5) * 0.5,
+            dy: (Math.random() - 0.5) * 0.5
+        }));
+
+        function drawBackground(t) {
+            const g = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, H / 1.2);
+            g.addColorStop(0, '#050010');
+            g.addColorStop(1, '#000');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+            // glow balls
+            for (const b of balls) {
+                b.x += b.dx;
+                b.y += b.dy;
+                if (b.x < 0 || b.x > W) b.dx *= -1;
+                if (b.y < 0 || b.y > H) b.dy *= -1;
+                const grd = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 4);
+                grd.addColorStop(0, `rgba(255,130,190,0.5)`);
+                grd.addColorStop(1, `rgba(255,130,190,0)`);
+                ctx.fillStyle = grd;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r * 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        /* Phases */
+        let phase = 0;
+        let fadeAlpha = 255;
+        let tCounter = 0;
+        let floatTimer = 0;
+        let fadeStart = 0;
+        const noteEl = document.getElementById('note');
+        let visibleLines = NOTE.map(() => ''),
+            lineIndex = 0,
+            charIndex = 0,
+            lastType = performance.now();
+        const TYPE_DELAY = 30;
+        let repeatCount = 0;
+
+        function loop(now) {
+            const dt = now - (loop.last || now);
+            loop.last = now;
+            tCounter += dt * 0.001;
+            drawBackground(now);
+            const pulse = 1 + 0.05 * Math.sin(tCounter * 2.5);
+            if (phase === 0) {
+                floatTimer += dt * 0.001;
+                for (let p of particles) {
+                    p.update(pulse);
+                    p.draw(fadeAlpha);
+                }
+                ctx.save();
+                const sc = 1 + 0.05 * Math.sin(tCounter * 3);
+                ctx.translate(W / 2, H / 2);
+                ctx.scale(sc, sc);
+                ctx.fillStyle = 'rgba(255,200,240,0.95)';
+                ctx.shadowColor = '#ff5ac9';
+                ctx.shadowBlur = 40;
+                ctx.font = '48px "Segoe Script",cursive';
+                ctx.textAlign = 'center';
+                ctx.fillText(MAIN_TEXT, 0, 8);
+                ctx.restore();
+                if (floatTimer > 3) {
+                    phase = 1;
+                    fadeStart = now;
+                }
+            } else if (phase === 1) {
+                const elapsed = (now - fadeStart) / 1000;
+                fadeAlpha = Math.max(0, 255 - Math.floor((elapsed / 1) * 255));
+                for (let p of particles) {
+                    p.update(pulse);
+                    p.draw(fadeAlpha);
+                }
+                if (fadeAlpha <= 0) {
+                    phase = 2;
+                    noteEl.textContent = '';
+                    lastType = now;
+                }
+            } else if (phase === 2) {
+                if (lineIndex < NOTE.length) {
+                    if (now - lastType > TYPE_DELAY) {
+                        const line = NOTE[lineIndex];
+                        if (charIndex < line.length) visibleLines[lineIndex] += line[charIndex++];
+                        else {
+                            lineIndex++;
+                            charIndex = 0;
+                        }
+                        noteEl.textContent = visibleLines.join('\n');
+                        lastType = now;
+                    }
+                } else {
+                    setTimeout(() => {
+                        repeatOrBear();
+                    }, 800);
+                    phase = 2.5;
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
+        /* Repeat twice then show bear */
+        function repeatOrBear() {
+            repeatCount++;
+            if (repeatCount < 2) {
+                lineIndex = 0;
+                charIndex = 0;
+                visibleLines = NOTE.map(() => '');
+
+                phase = 0;
+                fadeAlpha = 255;
+                floatTimer = 0;
+                initParticles();
+            } else {
+                showBearStage();
+            }
+        }
+
+        /* Bear animation */
+        const bearStage = document.getElementById('bearStage');
+        const bearImg = document.getElementById('bearImg');
+        let bearFrames = [],
+            bearIndex = 0,
+            bearInterval = null;
+
+        function loadBearFrames() {
+            const p = [];
+            for (let i = 1; i <= 6; i++) {
+                const img = new Image();
+                img.src = `bear${i}.png`;
+                p.push(new Promise(res => {
+                    img.onload = () => res({
+                        i,
+                        img
+                    });
+                    img.onerror = () => res(null);
+                }));
+            }
+            return Promise.all(p);
+        }
+
+        function showBearStage() {
+            ctx.clearRect(0, 0, W, H);
+            loadBearFrames().then(r => {
+                bearFrames = r.filter(x => x).map(x => x.img);
+                if (bearFrames.length === 0) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '26px Georgia';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Add bear1.png…bear6.png beside this file.', W / 2, H / 2);
+                    return;
+                }
+                bearStage.style.display = 'flex';
+                bearImg.src = bearFrames[0].src;
+                if (bearInterval) clearInterval(bearInterval);
+                bearInterval = setInterval(() => {
+                    bearIndex = (bearIndex + 1) % bearFrames.length;
+                    bearImg.src = bearFrames[bearIndex].src;
+                }, 160);
+            });
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+
+</html>
