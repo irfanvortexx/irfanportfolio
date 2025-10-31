@@ -1,362 +1,554 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Happy Birthday Shahana 💖</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-         :root {
-            --bg1: #000;
-            --bg2: #050010;
-            --text: #ffdce8;
-            --accent: #ff7ab5;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
         }
         
         html,
         body {
-            margin: 0;
-            height: 100%;
-            background: radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 100%);
-            font-family: Georgia, "Segoe UI", serif;
-            color: var(--text);
-            overflow: hidden;
+            width: 100%;
+            overflow-x: hidden;
         }
         
-        .wrap {
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        /* Music Player Box */
+        
+        .music-player {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.25);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        /* Header */
+        
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .player-header h4 {
+            font-family: "Segoe Script", cursive;
+            font-size: clamp(15px, 2vw, 20px);
+            color: #ff69b4;
+            align-items: center;
+            text-shadow: 0 0 15px #ff1493, 0 0 30px #ff69b4;
+            font-weight: 600;
+        }
+        
+        .player-header i {
+            font-size: 1.4rem;
+            color: #ff69b4;
+        }
+        /* Album Art */
+        
+        .album-art {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+        
+        .album-art img {
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            object-fit: cover;
+        }
+        /* Song Info */
+        
+        .song-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .song-info h2 {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+        
+        .song-info p {
+            color: #ffb6c1;
+            font-size: 0.95rem;
+        }
+        /* Progress bar */
+        
+        .progress-area {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff69b4, #ff1493);
+            border-radius: 10px;
             position: relative;
+            transition: width .1s linear;
         }
         
-        canvas {
-            display: block;
-            background: transparent;
-        }
-        
-        .overlay {
+        .progress::before {
+            content: "";
             position: absolute;
-            inset: 0;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity .2s;
+        }
+        
+        .progress-bar:hover .progress::before {
+            opacity: 1;
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #ffb6c1;
+        }
+        /* Controls */
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .controls i {
+            font-size: 1.3rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .controls i:hover {
+            color: #ff69b4;
+        }
+        
+        .controls .play-pause {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+            transition: transform 0.3s ease;
+        }
+        
+        .controls .play-pause:hover {
+            transform: scale(1.08);
+        }
+        
+        .controls .play-pause i {
+            font-size: 1.6rem;
+            color: #fff;
+        }
+        /* Volume */
+        
+        .volume-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            pointer-events: none;
+            margin-top: 15px;
+            gap: 10px;
         }
         
-        h2 {
-            font-family: "Segoe Script", "Brush Script MT", cursive;
-            font-size: 44px;
-            margin: 0;
-            text-align: center;
-            text-shadow: 0 0 20px #ff85c2, 0 0 40px #ff3ea6;
+        .volume-container i {
+            color: #ffb6c1;
+            font-size: 1rem;
         }
         
-        .note {
-            width: 76%;
-            max-width: 760px;
-            margin-top: 16px;
-            text-align: center;
-            line-height: 1.45;
-            font-size: 18px;
-            color: var(--text);
-            text-shadow: 0 0 10px #ff8aca;
+        .volume-slider {
+            width: 90px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
         }
         
-        .typing {
-            white-space: pre-wrap;
-            min-height: 180px
+        .volume-progress {
+            height: 100%;
+            width: 70%;
+            background: linear-gradient(90deg, #ff69b4, #ff1493);
+            border-radius: 10px;
+        }
+        /* Playlist */
+        
+        .playlist {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
         }
         
-        .bear-stage {
-            display: none;
-            flex-direction: column;
+        .playlist h3 {
+            margin-bottom: 8px;
+            color: #ff69b4;
+            font-size: 0.9rem;
+        }
+        
+        .playlist-item {
+            display: flex;
             align-items: center;
-            gap: 12px;
-            pointer-events: auto
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .3s;
+            margin-bottom: 5px;
         }
         
-        .bear-stage img {
-            max-width: 420px;
-            width: 50vmin;
-            max-height: 420px;
-            filter: drop-shadow(0 0 25px #ff7bd4);
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
-        .bear-stage h2 {
-            font-family: "Segoe Script", cursive;
-            font-size: 28px;
-            margin: 0;
-            color: var(--text);
-            text-shadow: 0 0 20px #ff78d1;
+        .playlist-item.active {
+            background: rgba(255, 105, 180, 0.2);
+            color: #ff69b4;
+        }
+        
+        .playlist-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .playlist-info h4 {
+            font-size: 0.85rem;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        
+        .playlist-info p {
+            font-size: 0.75rem;
+            color: #ffb6c1;
+        }
+        /* Error message */
+        
+        .error-message {
+            background: rgba(255, 20, 147, 0.25);
+            color: #ffb6c1;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: .8rem;
+            display: none;
+        }
+        /* Playlist Scroller */
+        
+        .playlist {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            scrollbar-width: thin;
+            /* For Firefox */
+            scrollbar-color: #ff69b4 #1a1a1a;
+            /* For Firefox */
+        }
+        /* Chrome, Edge, Safari scrollbar design */
+        
+        .playlist::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .playlist::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        
+        .playlist::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff69b4, #ff1493);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+        
+        .playlist::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff1493, #ff69b4);
         }
     </style>
 </head>
 
 <body>
-    <div class="wrap">
-        <canvas id="c"></canvas>
-        <div class="overlay">
-            <h2 id="title">Happy Birthday Shahana 💖</h2>
-            <div class="note typing" id="note"></div>
-            <div id="bearStage" class="bear-stage">
-                <img id="bearImg" src="" alt="bear frame" />
-                <h3>Happy Birthday Shahana 💖</h3>
+    <div class="music-player">
+        <div class="player-header">
+            <h4>Tamil Music Player</h4><i class="fas fa-music"></i></div>
+        <div class="album-art"><img src="https://i.ytimg.com/vi/7MaB3_mC3lA/maxresdefault.jpg" id="albumImage" alt="Album Art"></div>
+        <div class="song-info">
+            <h2 id="songTitle">Vennilavu</h2>
+            <p id="songArtist">Hiphop Tamizha</p>
+        </div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="progress-area">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress" id="progress"></div>
             </div>
+            <div class="timer"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+        </div>
+        <div class="controls">
+            <i class="fas fa-step-backward" id="prev"></i>
+            <div class="play-pause"><i class="fas fa-play" id="play"></i></div>
+            <i class="fas fa-step-forward" id="next"></i>
+        </div>
+        <div class="volume-container">
+            <i class="fas fa-volume-down"></i>
+            <div class="volume-slider" id="volumeSlider">
+                <div class="volume-progress" id="volumeProgress"></div>
+            </div>
+            <i class="fas fa-volume-up"></i>
+        </div>
+        <div class="playlist">
+            <h3 style="margin-bottom:8px;color:#1DB954;font-size:.9rem;">Playlist</h3>
+            <div id="playlistContainer"></div>
         </div>
     </div>
+
     <script>
-        /* Setup */
-        const CANVAS = document.getElementById('c');
-        const ctx = CANVAS.getContext('2d', {
-            alpha: true
-        });
-        let W = CANVAS.width = window.innerWidth;
-        let H = CANVAS.height = window.innerHeight;
-        const PARTICLES = 1500;
-        const MAIN_TEXT = "";
-        const NOTE = [
-            "In every line of code I've written for this little program,",
-            "I've poured in my love and gratitude for you.",
-            "You've been my inspiration, my light, and my everything.",
-            "Thank you for being the amazing person you are—",
-            "kind, beautiful, and endlessly supportive.",
-            "This is my way of saying how much I appreciate you",
-            "and all the joy you bring into my life."
-        ];
+        const songs = [{
+            title: "My Song 1",
+            artist: "Artist Name",
+            src: "song.mp3",
+            cover: "cover1.jpg"
+        }, {
+            title: "My Song 2",
+            artist: "Artist Name",
+            src: "song.mp3",
+            cover: "cover2.jpg"
+        }, {
+            title: "My Song 3",
+            artist: "Artist Name",
+            src: "song.mp3",
+            cover: "cover3.jpg"
+        }, {
+            title: "My Song 4",
+            artist: "Artist Name",
+            src: "song.mp3",
+            cover: "cover4.jpg"
+        }];
+        const albumImage = document.getElementById('albumImage'),
+            songTitle = document.getElementById('songTitle'),
+            songArtist = document.getElementById('songArtist'),
+            playBtn = document.getElementById('play'),
+            prevBtn = document.getElementById('prev'),
+            nextBtn = document.getElementById('next'),
+            progressBar = document.getElementById('progress'),
+            progressArea = document.getElementById('progressBar'),
+            currentTimeEl = document.getElementById('currentTime'),
+            durationEl = document.getElementById('duration'),
+            volumeSlider = document.getElementById('volumeSlider'),
+            volumeProgress = document.getElementById('volumeProgress'),
+            playlistContainer = document.getElementById('playlistContainer'),
+            errorMessage = document.getElementById('errorMessage');
+        const audio = new Audio();
+        let isPlaying = false,
+            songIndex = 0,
+            currentSongDuration = 0;
 
-        function heartPoint(t, s) {
-            const x = s * 16 * Math.pow(Math.sin(t), 3);
-            const y = -s * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-            return [x, y];
+        function initPlayer() {
+            loadSong(songs[songIndex]);
+            createPlaylist();
+            updatePlaylistActive();
+            playBtn.addEventListener('click', togglePlay);
+            prevBtn.addEventListener('click', prevSong);
+            nextBtn.addEventListener('click', nextSong);
+            progressArea.addEventListener('click', setProgress);
+            volumeSlider.addEventListener('click', setVolume);
+            audio.addEventListener('loadedmetadata', updateDuration);
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('ended', nextSong);
+            audio.addEventListener('error', handleAudioError);
+            audio.addEventListener('canplaythrough', hideError);
         }
 
-        function generateHeartPositions(n, scale, ox, oy) {
-            const pts = [];
-            for (let i = 0; i < n; i++) {
-                const t = Math.random() * Math.PI * 2;
-                const r = 0.7 + Math.random() * 0.3;
-                const [x, y] = heartPoint(t, scale * r);
-                pts.push([ox + x, oy + y]);
-            }
-            return pts;
-        }
-        class Particle {
-            constructor(target) {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H;
-                this.tx = target[0];
-                this.ty = target[1];
-                this.speed = 0.02 + Math.random() * 0.04;
-                this.size = 1 + Math.floor(Math.random() * 4);
-                const base = [255, 110, 175];
-                const v = i => Math.max(0, Math.min(255, base[i] + (Math.random() * 50 - 25)));
-                this.color = `rgba(${v(0)},${v(1)},${v(2)},`;
-            }
-            update(p) {
-                const cx = W / 2,
-                    cy = H / 2;
-                const dx = this.tx - cx,
-                    dy = this.ty - cy;
-                const txp = cx + dx * p,
-                    typ = cy + dy * p;
-                this.x += (txp - this.x) * this.speed;
-                this.y += (typ - this.y) * this.speed;
-            }
-            draw(a) {
-                const alpha = a / 255;
-                ctx.beginPath();
-                ctx.fillStyle = this.color + (alpha * 0.4) + ')';
-                ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.fillStyle = this.color + alpha + ')';
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        let heartPos = [],
-            particles = [];
-
-        function initParticles() {
-            heartPos = generateHeartPositions(PARTICLES, Math.min(W, H) / 45, W / 2, H / 2);
-            particles = heartPos.map(p => new Particle(p));
-        }
-        initParticles();
-
-        /* Background floating glow balls */
-        const balls = Array.from({
-            length: 50
-        }, () => ({
-            x: Math.random() * W,
-            y: Math.random() * H,
-            r: Math.random() * 3 + 2,
-            dx: (Math.random() - 0.5) * 0.5,
-            dy: (Math.random() - 0.5) * 0.5
-        }));
-
-        function drawBackground(t) {
-            const g = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, H / 1.2);
-            g.addColorStop(0, '#050010');
-            g.addColorStop(1, '#000');
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, W, H);
-            // glow balls
-            for (const b of balls) {
-                b.x += b.dx;
-                b.y += b.dy;
-                if (b.x < 0 || b.x > W) b.dx *= -1;
-                if (b.y < 0 || b.y > H) b.dy *= -1;
-                const grd = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 4);
-                grd.addColorStop(0, `rgba(255,130,190,0.5)`);
-                grd.addColorStop(1, `rgba(255,130,190,0)`);
-                ctx.fillStyle = grd;
-                ctx.beginPath();
-                ctx.arc(b.x, b.y, b.r * 4, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        function loadSong(song) {
+            hideError();
+            songTitle.textContent = song.title;
+            songArtist.textContent = song.artist;
+            albumImage.src = song.cover;
+            progressBar.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+            durationEl.textContent = '0:00';
+            audio.src = song.src;
+            currentSongDuration = 0;
+            audio.load();
         }
 
-        /* Phases */
-        let phase = 0;
-        let fadeAlpha = 255;
-        let tCounter = 0;
-        let floatTimer = 0;
-        let fadeStart = 0;
-        const noteEl = document.getElementById('note');
-        let visibleLines = NOTE.map(() => ''),
-            lineIndex = 0,
-            charIndex = 0,
-            lastType = performance.now();
-        const TYPE_DELAY = 30;
-        let repeatCount = 0;
-
-        function loop(now) {
-            const dt = now - (loop.last || now);
-            loop.last = now;
-            tCounter += dt * 0.001;
-            drawBackground(now);
-            const pulse = 1 + 0.05 * Math.sin(tCounter * 2.5);
-            if (phase === 0) {
-                floatTimer += dt * 0.001;
-                for (let p of particles) {
-                    p.update(pulse);
-                    p.draw(fadeAlpha);
-                }
-                ctx.save();
-                const sc = 1 + 0.05 * Math.sin(tCounter * 3);
-                ctx.translate(W / 2, H / 2);
-                ctx.scale(sc, sc);
-                ctx.fillStyle = 'rgba(255,200,240,0.95)';
-                ctx.shadowColor = '#ff5ac9';
-                ctx.shadowBlur = 40;
-                ctx.font = '48px "Segoe Script",cursive';
-                ctx.textAlign = 'center';
-                ctx.fillText(MAIN_TEXT, 0, 8);
-                ctx.restore();
-                if (floatTimer > 3) {
-                    phase = 1;
-                    fadeStart = now;
-                }
-            } else if (phase === 1) {
-                const elapsed = (now - fadeStart) / 1000;
-                fadeAlpha = Math.max(0, 255 - Math.floor((elapsed / 1) * 255));
-                for (let p of particles) {
-                    p.update(pulse);
-                    p.draw(fadeAlpha);
-                }
-                if (fadeAlpha <= 0) {
-                    phase = 2;
-                    noteEl.textContent = '';
-                    lastType = now;
-                }
-            } else if (phase === 2) {
-                if (lineIndex < NOTE.length) {
-                    if (now - lastType > TYPE_DELAY) {
-                        const line = NOTE[lineIndex];
-                        if (charIndex < line.length) visibleLines[lineIndex] += line[charIndex++];
-                        else {
-                            lineIndex++;
-                            charIndex = 0;
-                        }
-                        noteEl.textContent = visibleLines.join('\n');
-                        lastType = now;
-                    }
-                } else {
-                    setTimeout(() => {
-                        repeatOrBear();
-                    }, 800);
-                    phase = 2.5;
-                }
-            }
-            requestAnimationFrame(loop);
+        function togglePlay() {
+            isPlaying ? pauseSong() : playSong();
         }
 
-        /* Repeat twice then show bear */
-        function repeatOrBear() {
-            repeatCount++;
-            if (repeatCount < 2) {
-                lineIndex = 0;
-                charIndex = 0;
-                visibleLines = NOTE.map(() => '');
-
-                phase = 0;
-                fadeAlpha = 255;
-                floatTimer = 0;
-                initParticles();
-            } else {
-                showBearStage();
+        function playSong() {
+            if (audio.readyState < 2) {
+                showError("Audio file is loading. Please wait.");
+                return;
             }
-        }
-
-        /* Bear animation */
-        const bearStage = document.getElementById('bearStage');
-        const bearImg = document.getElementById('bearImg');
-        let bearFrames = [],
-            bearIndex = 0,
-            bearInterval = null;
-
-        function loadBearFrames() {
-            const p = [];
-            for (let i = 1; i <= 6; i++) {
-                const img = new Image();
-                img.src = `bear${i}.png`;
-                p.push(new Promise(res => {
-                    img.onload = () => res({
-                        i,
-                        img
-                    });
-                    img.onerror = () => res(null);
-                }));
+            if (audio.error) {
+                showError("Error playing audio file.");
+                return;
             }
-            return Promise.all(p);
-        }
-
-        function showBearStage() {
-            ctx.clearRect(0, 0, W, H);
-            loadBearFrames().then(r => {
-                bearFrames = r.filter(x => x).map(x => x.img);
-                if (bearFrames.length === 0) {
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '26px Georgia';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Add bear1.png…bear6.png beside this file.', W / 2, H / 2);
-                    return;
-                }
-                bearStage.style.display = 'flex';
-                bearImg.src = bearFrames[0].src;
-                if (bearInterval) clearInterval(bearInterval);
-                bearInterval = setInterval(() => {
-                    bearIndex = (bearIndex + 1) % bearFrames.length;
-                    bearImg.src = bearFrames[bearIndex].src;
-                }, 160);
+            isPlaying = true;
+            playBtn.classList.replace('fa-play', 'fa-pause');
+            audio.play().catch(e => {
+                showError("Play failed: " + e.message);
+                pauseSong();
             });
         }
-        requestAnimationFrame(loop);
+
+        function pauseSong() {
+            isPlaying = false;
+            playBtn.classList.replace('fa-pause', 'fa-play');
+            audio.pause();
+        }
+
+        function prevSong() {
+            songIndex--;
+            if (songIndex < 0) songIndex = songs.length - 1;
+            loadSong(songs[songIndex]);
+            updatePlaylistActive();
+            if (isPlaying) setTimeout(() => playSong(), 500);
+        }
+
+        function nextSong() {
+            songIndex++;
+            if (songIndex > songs.length - 1) songIndex = 0;
+            loadSong(songs[songIndex]);
+            updatePlaylistActive();
+            if (isPlaying) setTimeout(() => playSong(), 500);
+        }
+
+        function updateProgress() {
+            const {
+                currentTime,
+                duration
+            } = audio;
+            if (isFinite(duration) && duration > 0) {
+                currentSongDuration = duration;
+                progressBar.style.width = `${(currentTime/duration)*100}%`;
+                currentTimeEl.textContent = formatTime(currentTime);
+                durationEl.textContent = formatTime(duration);
+            } else currentTimeEl.textContent = formatTime(currentTime);
+        }
+
+        function updateDuration() {
+            const {
+                duration
+            } = audio;
+            if (isFinite(duration) && duration > 0) {
+                currentSongDuration = duration;
+                durationEl.textContent = formatTime(duration);
+            }
+        }
+
+        function setProgress(e) {
+            if (!isFinite(currentSongDuration) || currentSongDuration <= 0) {
+                showError("Cannot seek - duration not available");
+                return;
+            }
+            const width = this.clientWidth,
+                clickX = e.offsetX;
+            const newTime = (clickX / width) * currentSongDuration;
+            if (isFinite(newTime)) audio.currentTime = newTime;
+        }
+
+        function setVolume(e) {
+            const width = this.clientWidth,
+                clickX = e.offsetX;
+            const volume = Math.max(0, Math.min(1, clickX / width));
+            audio.volume = volume;
+            volumeProgress.style.width = `${volume*100}%`;
+        }
+
+        function formatTime(s) {
+            if (!isFinite(s) || s < 0) return "0:00";
+            const m = Math.floor(s / 60),
+                sec = Math.floor(s % 60);
+            return `${m}:${sec<10?'0':''}${sec}`;
+        }
+
+        function createPlaylist() {
+            songs.forEach((song, i) => {
+                const item = document.createElement('div');
+                item.classList.add('playlist-item');
+                if (i === songIndex) item.classList.add('active');
+                item.innerHTML = `<img src="${song.cover}" alt="${song.title}"><div class="playlist-info"><h4>${song.title}</h4><p>${song.artist}</p></div>`;
+                item.addEventListener('click', () => {
+                    songIndex = i;
+                    loadSong(songs[songIndex]);
+                    updatePlaylistActive();
+                    if (isPlaying) setTimeout(() => playSong(), 500);
+                });
+                playlistContainer.appendChild(item);
+            });
+        }
+
+        function updatePlaylistActive() {
+            document.querySelectorAll('.playlist-item').forEach((it, i) => {
+                i === songIndex ? it.classList.add('active') : it.classList.remove('active');
+            });
+        }
+
+        function handleAudioError() {
+            showError("Failed to load audio. Check connection.");
+            pauseSong();
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        window.addEventListener('load', initPlayer);
     </script>
 </body>
 
